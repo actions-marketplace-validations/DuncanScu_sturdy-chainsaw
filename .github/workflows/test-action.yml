@@ -1,11 +1,7 @@
-name: Test
+name: Manual Test
+
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   run-action:
@@ -14,21 +10,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-
-      - name: Use Node.js 16.x
-        uses: actions/setup-node@v2
-        with:
-          node-version: 16.x
-          cache: 'npm'
-          cache-dependency-path: package-lock.json
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build
-
-      - name: Run my action
+      - run: npm ci
+      - run: npm run build
+      - run: npm test
+      - name: Create test report
         uses: ./
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
