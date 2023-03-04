@@ -1,15 +1,17 @@
 import * as core from '@actions/core'
-const github = require('@actions/github');
-const { context } = require('@actions/github')
-const { pull_request } = context.payload;
+import * as github from '@actions/github'
 
 async function run(): Promise<void> {
-  const GITHUB_TOKEN = core.getInput('GITHUB_TOKEN');
-  const octokit = github.getOctokit(GITHUB_TOKEN);
+  const token = core.getInput("token", {required: true});
+  const octokit = github.getOctokit(token);
+  const context = github.context;
+  
+
   await octokit.rest.issues.createComment({
-    ...context.repo,
-    issue_number: pull_request.number,
-    body: 'Thank you for submitting a pull request! We will try to review this as soon as we can.'
+    owner: "DuncanScu",
+    repo: "sturdy-chainsaw",
+    issue_number: 10,
+    body: "Testing....please work"
   });
 }
 

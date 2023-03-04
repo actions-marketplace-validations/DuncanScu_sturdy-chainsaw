@@ -36,14 +36,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
-const github = __nccwpck_require__(5438);
-const { context } = __nccwpck_require__(5438);
-const { pull_request } = context.payload;
+const github = __importStar(__nccwpck_require__(5438));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
-        const GITHUB_TOKEN = core.getInput('GITHUB_TOKEN');
-        const octokit = github.getOctokit(GITHUB_TOKEN);
-        yield octokit.rest.issues.createComment(Object.assign(Object.assign({}, context.repo), { issue_number: pull_request.number, body: 'Thank you for submitting a pull request! We will try to review this as soon as we can.' }));
+        const token = core.getInput("token", { required: true });
+        const octokit = github.getOctokit(token);
+        const context = github.context;
+        yield octokit.rest.issues.createComment({
+            owner: "DuncanScu",
+            repo: "sturdy-chainsaw",
+            issue_number: 10,
+            body: "Testing....please work"
+        });
     });
 }
 run();
