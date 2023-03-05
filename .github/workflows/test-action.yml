@@ -19,5 +19,3 @@ jobs:
       - run: npm test
       - name: Create test report
         uses: ./
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
