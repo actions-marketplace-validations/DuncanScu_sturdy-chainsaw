@@ -40,6 +40,7 @@ const github = __importStar(__nccwpck_require__(5438));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         const token = core.getInput('token');
+        console.log(token);
         const octokit = github.getOctokit(token);
         const context = github.context;
         yield octokit.rest.issues.createComment({
