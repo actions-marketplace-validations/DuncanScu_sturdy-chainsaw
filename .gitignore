@@ -100,3 +100,4 @@ lib/**/*
 
 # Ignore Test Outputs
 .reports/dotnet-reports/Calculator/TestResults/*
+reports/dotnet-reports/Calculator/.idea*
