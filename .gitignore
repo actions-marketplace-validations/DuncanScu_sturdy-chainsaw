@@ -97,7 +97,3 @@ Thumbs.db
 # Ignore built ts files
 __tests__/runner/*
 lib/**/*
-
-# Ignore Test Outputs
-.reports/dotnet-reports/Calculator/TestResults/*
-reports/dotnet-reports/Calculator/.idea*
