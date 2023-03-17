@@ -2,10 +2,35 @@ name: 'Your name here'
 description: 'Provide a description here'
 author: 'Your name or organization here'
 inputs:
-  token:
-    description: GitHub Access Token
+  github-token:
+    description: 'GitHub repository token'
+    required: true
+  results-path:
+    description: 'Path to the directory containing trx files'
+    required: true
+  coverage-path:
+    description: 'Path to the file containing test coverage'
     required: false
-    default: ${{ github.token }}
+  coverage-type:
+    description: 'Coverage file type'
+    required: false
+    default: 'opencover'
+  coverage-threshold:
+    description: 'Minimum allowed coverage (from 0.00 to 100.00)'
+    required: false
+  comment-title:
+    description: 'Pull Request comment title'
+    required: false
+    default: 'Test Results'
+  post-new-comment:
+    description: 'Boolean flag. Set to true to post a new comment after each run'
+    required: false
+    default: false
+  allow-failed-tests:
+    description: 'Boolean flag. Set to true to prevent failed tests from failing the job'
+    required: false
+    default: false
+
 runs:
   using: 'node16'
   main: 'dist/index.js'
