@@ -5,7 +5,7 @@ import { log } from './action';
 
 type Octokit = InstanceType<typeof GitHub>;
 
-interface IContext {
+export interface IContext {
   owner: string;
   repo: string;
   commit: string;
@@ -16,7 +16,7 @@ interface IContext {
 export const publishComment = async (
   token: string,
   title: string,
-  message: string,
+  body: string,
 ): Promise<void> => {
   const context = getContext();
   const { owner, repo, runId, issueNumber, commit } = context;
@@ -26,13 +26,10 @@ export const publishComment = async (
     return;
   }
 
-  const header = formatHeaderMarkdown(title);
+  const header = formatHeaderMarkdown(title); // I need a way to get around using this as it is created twice
+
   const octokit = getOctokit(token);
   const existingComment = await getExistingComment(octokit, context, header);
-
-  const summaryLink = formatSummaryLinkMarkdown(owner, repo, runId, title);
-  const footer = commit ? formatFooterMarkdown(commit) : '';
-  const body = `${header}${message}${summaryLink}${footer}`;
 
   if (existingComment) {
     await octokit.rest.issues.updateComment({ owner, repo, comment_id: existingComment.id, body });
@@ -41,7 +38,7 @@ export const publishComment = async (
   }
 };
 
-const getContext = (): IContext => {
+export const getContext = (): IContext => {
   const {
     runId,
     payload: { pull_request, repository, after }

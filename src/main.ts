@@ -1,7 +1,7 @@
 import { getInputs, publishComment, setFailed, setSummary } from './utils';
-import { formatResultMarkdown } from './formatting/markdown';
-import { formatResultHtml, formatTitleHtml } from './formatting/html';
 import { TestReportProcessor } from './TestReportProcessor';
+import { CommentBuilder } from './CommentBuilder';
+import { SummaryGenerator } from './SummaryGenerator';
 
 const run = async (): Promise<void> => {
   try {
@@ -15,14 +15,19 @@ const run = async (): Promise<void> => {
     const testReportProcessor = new TestReportProcessor();
     var testResult = await testReportProcessor.processReports(resultsPath)
 
+    // Build the comment
+    const commentBuilder = new CommentBuilder(testResult);
+    const comment = commentBuilder
+      .WithHeader()
+      .WithSummaryLink()
+      .WithFooter()
+      .Build();
 
-    // Generating the report
-    let comment = '';
-    let summary = formatTitleHtml(title);
+    // Generate the summary
+    const summaryGenerator = new SummaryGenerator();
+    const summary = summaryGenerator.generateSummary(title, testResult);
 
-    comment += formatResultMarkdown(testResult);
-    summary += formatResultHtml(testResult);
-
+    // Set the summary
     await setSummary(summary);
 
     // Publishing results
