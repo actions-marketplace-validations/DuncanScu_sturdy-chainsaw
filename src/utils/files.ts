@@ -15,17 +15,3 @@ export const readXmlFile = async (filePath: string): Promise<any> => {
     return null;
   }
 };
-
-export const findFilesInDirectory = (directoryPath: string, extension: string): string[] => {
-  try {
-    if (!fs.existsSync(directoryPath)) {
-      return [];
-    }
-
-    const fileNames = fs.readdirSync(directoryPath);
-    const filteredFileNames = fileNames.filter(fileName => fileName.endsWith(extension));
-    return filteredFileNames.map(fileName => path.join(directoryPath, fileName));
-  } catch {
-    return [];
-  }
-};

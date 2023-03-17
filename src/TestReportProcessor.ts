@@ -5,10 +5,6 @@ import parseTrx from './parsers/trx';
 import { log, setFailed, setResultOutputs } from "./utils";
 
 export class TestReportProcessor{
-
-    constructor(){
-    }
-  
     public async processReports(reportPath :string): Promise<IResult>{
       const result = this.DefaultTestResult;
       const filePaths = this.findReportsInDirectory(reportPath, '.trx');

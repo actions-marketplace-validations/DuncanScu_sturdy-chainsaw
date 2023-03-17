@@ -1,27 +1,6 @@
 import { IResult } from './data';
-import { findFilesInDirectory, log, setFailed, setResultOutputs } from './utils';
+import { log } from './utils';
 import parseTrx from './parsers/trx';
-
-export const processTestResults = async (resultsPath: string): Promise<IResult> => {
-  const result = DefaultTestResult;
-  const filePaths = findFilesInDirectory(resultsPath, '.trx');
-
-  if (!filePaths.length) {
-    throw Error(`No test results found in ${resultsPath}`);
-  }
-
-  for (const path of filePaths) {
-    await processResult(path, result);
-  }
-
-  setResultOutputs(result);
-
-  if (!result.success) {
-    setFailed('Tests Failed');
-  }
-
-  return result;
-};
 
 const processResult = async (path: string, aggregatedResult: IResult): Promise<void> => {
   const result = await parseTrx(path);
