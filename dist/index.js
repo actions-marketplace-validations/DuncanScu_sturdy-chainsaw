@@ -1,6 +1,98 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 7182:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.TestReportProcessor = void 0;
+const fs_1 = __importDefault(__nccwpck_require__(5747));
+const path_1 = __importDefault(__nccwpck_require__(5622));
+const trx_1 = __importDefault(__nccwpck_require__(7421));
+const utils_1 = __nccwpck_require__(1606);
+class TestReportProcessor {
+    constructor() {
+        this.DefaultTestResult = {
+            success: true,
+            elapsed: 0,
+            total: 0,
+            passed: 0,
+            failed: 0,
+            skipped: 0,
+            suits: []
+        };
+    }
+    processReports(reportPath) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const result = this.DefaultTestResult;
+            const filePaths = this.findReportsInDirectory(reportPath, '.trx');
+            if (!filePaths.length) {
+                throw Error(`No test results found in ${reportPath}`);
+            }
+            for (const path of filePaths) {
+                yield this.processResult(path, result);
+            }
+            (0, utils_1.setResultOutputs)(result);
+            if (!result.success) {
+                (0, utils_1.setFailed)('Tests Failed');
+            }
+            return result;
+        });
+    }
+    findReportsInDirectory(directoryPath, extension) {
+        try {
+            if (!fs_1.default.existsSync(directoryPath)) {
+                return [];
+            }
+            const fileNames = fs_1.default.readdirSync(directoryPath);
+            const filteredFileNames = fileNames.filter(fileName => fileName.endsWith(extension));
+            return filteredFileNames.map(fileName => path_1.default.join(directoryPath, fileName));
+        }
+        catch (_a) {
+            return [];
+        }
+    }
+    processResult(path, aggregatedResult) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const result = yield (0, trx_1.default)(path);
+            if (!result) {
+                throw Error(`Failed parsing ${path}`);
+            }
+            (0, utils_1.log)(`Processed ${path}`);
+            this.mergeTestResults(aggregatedResult, result);
+        });
+    }
+    ;
+    mergeTestResults(result1, result2) {
+        result1.success = result1.success && result2.success;
+        result1.elapsed += result2.elapsed;
+        result1.total += result2.total;
+        result1.passed += result2.passed;
+        result1.failed += result2.failed;
+        result1.skipped += result2.skipped;
+        result1.suits.push(...result2.suits);
+    }
+    ;
+}
+exports.TestReportProcessor = TestReportProcessor;
+
+
+/***/ }),
+
 /***/ 2205:
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -160,19 +252,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const results_1 = __nccwpck_require__(8100);
 const utils_1 = __nccwpck_require__(1606);
 const markdown_1 = __nccwpck_require__(6162);
 const html_1 = __nccwpck_require__(5957);
+const TestReportProcessor_1 = __nccwpck_require__(7182);
 const run = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { token, title, resultsPath } = (0, utils_1.getInputs)();
+        // Getting the test results
+        const testReportProcessor = new TestReportProcessor_1.TestReportProcessor();
+        var testResult = yield testReportProcessor.processReports(resultsPath);
+        // Generating the report
         let comment = '';
         let summary = (0, html_1.formatTitleHtml)(title);
-        const testResult = yield (0, results_1.processTestResults)(resultsPath);
         comment += (0, markdown_1.formatResultMarkdown)(testResult);
         summary += (0, html_1.formatResultHtml)(testResult);
         yield (0, utils_1.setSummary)(summary);
+        // Publishing results
         yield (0, utils_1.publishComment)(token, title, comment);
     }
     catch (error) {
@@ -304,73 +400,6 @@ const parseSuits = (file) => {
     return suits;
 };
 exports.default = parseTrx;
-
-
-/***/ }),
-
-/***/ 8100:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.processTestResults = void 0;
-const utils_1 = __nccwpck_require__(1606);
-const trx_1 = __importDefault(__nccwpck_require__(7421));
-const processTestResults = (resultsPath) => __awaiter(void 0, void 0, void 0, function* () {
-    const aggregatedResult = getDefaultTestResult();
-    const filePaths = (0, utils_1.findFiles)(resultsPath, '.trx');
-    if (!filePaths.length) {
-        throw Error(`No test results found in ${resultsPath}`);
-    }
-    for (const path of filePaths) {
-        yield processResult(path, aggregatedResult);
-    }
-    (0, utils_1.setResultOutputs)(aggregatedResult);
-    if (!aggregatedResult.success) {
-        (0, utils_1.setFailed)('Tests Failed');
-    }
-    return aggregatedResult;
-});
-exports.processTestResults = processTestResults;
-const processResult = (path, aggregatedResult) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield (0, trx_1.default)(path);
-    if (!result) {
-        throw Error(`Failed parsing ${path}`);
-    }
-    (0, utils_1.log)(`Processed ${path}`);
-    mergeTestResults(aggregatedResult, result);
-});
-const mergeTestResults = (result1, result2) => {
-    result1.success = result1.success && result2.success;
-    result1.elapsed += result2.elapsed;
-    result1.total += result2.total;
-    result1.passed += result2.passed;
-    result1.failed += result2.failed;
-    result1.skipped += result2.skipped;
-    result1.suits.push(...result2.suits);
-};
-const getDefaultTestResult = () => ({
-    success: true,
-    elapsed: 0,
-    total: 0,
-    passed: 0,
-    failed: 0,
-    skipped: 0,
-    suits: []
-});
 
 
 /***/ }),
@@ -545,9 +574,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.findFiles = exports.readXmlFile = void 0;
+exports.readXmlFile = void 0;
 const fs_1 = __importDefault(__nccwpck_require__(5747));
-const path_1 = __importDefault(__nccwpck_require__(5622));
 const xml2js_1 = __importDefault(__nccwpck_require__(6189));
 const readXmlFile = (filePath) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -563,20 +591,6 @@ const readXmlFile = (filePath) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 exports.readXmlFile = readXmlFile;
-const findFiles = (directoryPath, extension) => {
-    try {
-        if (!fs_1.default.existsSync(directoryPath)) {
-            return [];
-        }
-        const fileNames = fs_1.default.readdirSync(directoryPath);
-        const filteredFileNames = fileNames.filter(fileName => fileName.endsWith(extension));
-        return filteredFileNames.map(fileName => path_1.default.join(directoryPath, fileName));
-    }
-    catch (_a) {
-        return [];
-    }
-};
-exports.findFiles = findFiles;
 
 
 /***/ }),
