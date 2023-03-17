@@ -1,19 +1,40 @@
-import * as core from '@actions/core'
-import * as github from '@actions/github'
+import { getInputs, publishComment, setFailed, setSummary } from './utils';
+import { TestReportProcessor } from './TestReportProcessor';
+import { CommentBuilder } from './CommentBuilder';
+import { SummaryGenerator } from './SummaryGenerator';
 
-async function run(): Promise<void> {
-  const token = core.getInput('token');
-  console.log(token)
-  const octokit = github.getOctokit(token);
-  const context = github.context;
-  
+const run = async (): Promise<void> => {
+  try {
+    const {
+      token,
+      title,
+      resultsPath
+    } = getInputs();
 
-  await octokit.rest.issues.createComment({
-    owner: "DuncanScu",
-    repo: "sturdy-chainsaw",
-    issue_number: 10,
-    body: "Testing....please work"
-  });
-}
+    // Getting the test results
+    const testReportProcessor = new TestReportProcessor();
+    var testResult = await testReportProcessor.processReports(resultsPath)
+
+    // Build the comment
+    const commentBuilder = new CommentBuilder(testResult);
+    const comment = commentBuilder
+      .withHeader(title)
+      .withSummaryLink()
+      .withFooter()
+      .build();
+
+    // Generate the summary
+    const summaryGenerator = new SummaryGenerator();
+    const summary = summaryGenerator.generateSummary(title, testResult);
+
+    // Set the summary
+    await setSummary(summary);
+
+    // Publishing results
+    await publishComment(token, title, comment);
+  } catch (error) {
+    setFailed((error as Error).message);
+  }
+};
 
 run()
