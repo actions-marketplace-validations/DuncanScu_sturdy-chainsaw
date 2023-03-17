@@ -1,6 +1,9 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'TestSpotlight'
+description: 'An easier way to see what broke your code.'
+author: 'DuncanScu'
+branding:
+  icon: '	percent'
+  color: 'green'
 inputs:
   github-token:
     description: 'GitHub repository token'

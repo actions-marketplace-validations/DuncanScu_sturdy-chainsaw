@@ -34,7 +34,7 @@ export const formatResultHtml = (result: IResult): string => {
 };
 
 const formatTestSuit = (suit: ITestSuit): string => {
-  const icon = (suit.success ? '🧪' : '❌');
+  const icon = '🚨';
   const summary = `${icon} ${suit.name} - ${suit.passed}/${suit.tests.length}`;
   const hasOutput = suit.tests.some(test => test.output || test.error);
 

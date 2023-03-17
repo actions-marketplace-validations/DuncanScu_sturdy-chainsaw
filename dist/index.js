@@ -211,7 +211,7 @@ const formatResultHtml = (result) => {
 };
 exports.formatResultHtml = formatResultHtml;
 const formatTestSuit = (suit) => {
-    const icon = (suit.success ? '🧪' : '❌');
+    const icon = '🚨';
     const summary = `${icon} ${suit.name} - ${suit.passed}/${suit.tests.length}`;
     const hasOutput = suit.tests.some(test => test.output || test.error);
     const table = formatTable([{ name: 'Result', align: 'center' }, { name: 'Test' }, ...(hasOutput ? [{ name: 'Output' }] : [])], suit.tests.map(test => [outcomeIcons[test.outcome], test.name, ...(hasOutput ? [formatTestOutput(test)] : [])]));
