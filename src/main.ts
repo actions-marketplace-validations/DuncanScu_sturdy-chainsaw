@@ -18,10 +18,10 @@ const run = async (): Promise<void> => {
     // Build the comment
     const commentBuilder = new CommentBuilder(testResult);
     const comment = commentBuilder
-      .WithHeader()
-      .WithSummaryLink()
-      .WithFooter()
-      .Build();
+      .withHeader(title)
+      .withSummaryLink()
+      .withFooter()
+      .build();
 
     // Generate the summary
     const summaryGenerator = new SummaryGenerator();
@@ -36,6 +36,5 @@ const run = async (): Promise<void> => {
     setFailed((error as Error).message);
   }
 };
-
 
 run()

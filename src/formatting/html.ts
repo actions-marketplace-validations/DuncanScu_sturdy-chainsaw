@@ -1,5 +1,5 @@
 import { IResult, ITest, ITestSuit, TestOutcome } from '../data';
-import { formatElapsedTime, getSectionLink, getStatusIcon } from './common';
+import { formatElapsedTime, getSectionLink } from './common';
 
 interface Element {
   tag: string;
@@ -48,7 +48,7 @@ const formatLinesToCover = (linesToCover: number[]): string => {
 };
 
 const formatTestSuit = (suit: ITestSuit): string => {
-  const icon = getStatusIcon(suit.success);
+  const icon = (suit.success ? '🧪' : '❌');
   const summary = `${icon} ${suit.name} - ${suit.passed}/${suit.tests.length}`;
   const hasOutput = suit.tests.some(test => test.output || test.error);
 
