@@ -28,7 +28,7 @@ export const formatResultHtml = (result: IResult): string => {
     [[`${result.passed}`, `${result.failed}`, `${result.skipped}`, formatElapsedTime(result.elapsed)]]
   );
 
-  html += result.suits.map(formatTestSuit).join('');
+  html += result.suits.filter((suit) => !suit.success).map(formatTestSuit).join('');
 
   return html;
 };
@@ -36,7 +36,7 @@ export const formatResultHtml = (result: IResult): string => {
 const formatTestSuit = (suit: ITestSuit): string => {
   const icon = (suit.success ? '🧪' : '❌');
   const summary = `${icon} ${suit.name} - ${suit.passed}/${suit.tests.length}`;
-  const hasOutput = suit.tests.some(test => test.error);
+  const hasOutput = suit.tests.some(test => test.output || test.error);
 
   const table = formatTable(
     [{ name: 'Result', align: 'center' }, { name: 'Test' }, ...(hasOutput ? [{ name: 'Output' }] : [])],

@@ -206,14 +206,14 @@ exports.formatTitleHtml = formatTitleHtml;
 const formatResultHtml = (result) => {
     let html = wrap('Test Results', 'h3');
     html += formatTable([{ name: '🧪 Passed' }, { name: '❌ Failed' }, { name: '⚠️ Skipped' }, { name: '⏱️ Time' }], [[`${result.passed}`, `${result.failed}`, `${result.skipped}`, (0, common_1.formatElapsedTime)(result.elapsed)]]);
-    html += result.suits.map(formatTestSuit).join('');
+    html += result.suits.filter((suit) => !suit.success).map(formatTestSuit).join('');
     return html;
 };
 exports.formatResultHtml = formatResultHtml;
 const formatTestSuit = (suit) => {
     const icon = (suit.success ? '🧪' : '❌');
     const summary = `${icon} ${suit.name} - ${suit.passed}/${suit.tests.length}`;
-    const hasOutput = suit.tests.some(test => test.error);
+    const hasOutput = suit.tests.some(test => test.output || test.error);
     const table = formatTable([{ name: 'Result', align: 'center' }, { name: 'Test' }, ...(hasOutput ? [{ name: 'Output' }] : [])], suit.tests.map(test => [outcomeIcons[test.outcome], test.name, ...(hasOutput ? [formatTestOutput(test)] : [])]));
     return formatDetails(summary, table);
 };
