@@ -1,6 +1,65 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 8278:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.CommentBuilder = void 0;
+const markdown_1 = __nccwpck_require__(6162);
+const utils_1 = __nccwpck_require__(1606);
+class CommentBuilder {
+    constructor(testResult) {
+        this._header = "";
+        this._summaryLink = "";
+        this._footer = "";
+        this._message = "";
+        this._title = "";
+        this._message = (0, markdown_1.formatResultMarkdown)(testResult);
+        this._context = (0, utils_1.getContext)();
+    }
+    WithHeader(title = "Tests") {
+        this._title = title;
+        this._header = (0, markdown_1.formatHeaderMarkdown)(title);
+        return this;
+    }
+    WithSummaryLink() {
+        this._summaryLink = (0, markdown_1.formatSummaryLinkMarkdown)(this._context.owner, this._context.repo, this._context.runId, this._title);
+        return this;
+    }
+    WithFooter() {
+        this._footer = this._context.commit ? (0, markdown_1.formatFooterMarkdown)(this._context.commit) : '';
+        return this;
+    }
+    Build() {
+        return `${this._header}${this._message}${this._summaryLink}${this._footer}`;
+    }
+}
+exports.CommentBuilder = CommentBuilder;
+
+
+/***/ }),
+
+/***/ 7601:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.SummaryGenerator = void 0;
+const html_1 = __nccwpck_require__(5957);
+class SummaryGenerator {
+    generateSummary(title, testResult) {
+        return (0, html_1.formatTitleHtml)(title) + (0, html_1.formatResultHtml)(testResult);
+    }
+}
+exports.SummaryGenerator = SummaryGenerator;
+
+
+/***/ }),
+
 /***/ 7182:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -253,20 +312,26 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const utils_1 = __nccwpck_require__(1606);
-const markdown_1 = __nccwpck_require__(6162);
-const html_1 = __nccwpck_require__(5957);
 const TestReportProcessor_1 = __nccwpck_require__(7182);
+const CommentBuilder_1 = __nccwpck_require__(8278);
+const SummaryGenerator_1 = __nccwpck_require__(7601);
 const run = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { token, title, resultsPath } = (0, utils_1.getInputs)();
         // Getting the test results
         const testReportProcessor = new TestReportProcessor_1.TestReportProcessor();
         var testResult = yield testReportProcessor.processReports(resultsPath);
-        // Generating the report
-        let comment = '';
-        let summary = (0, html_1.formatTitleHtml)(title);
-        comment += (0, markdown_1.formatResultMarkdown)(testResult);
-        summary += (0, html_1.formatResultHtml)(testResult);
+        // Build the comment
+        const commentBuilder = new CommentBuilder_1.CommentBuilder(testResult);
+        const comment = commentBuilder
+            .WithHeader()
+            .WithSummaryLink()
+            .WithFooter()
+            .Build();
+        // Generate the summary
+        const summaryGenerator = new SummaryGenerator_1.SummaryGenerator();
+        const summary = summaryGenerator.generateSummary(title, testResult);
+        // Set the summary
         yield (0, utils_1.setSummary)(summary);
         // Publishing results
         yield (0, utils_1.publishComment)(token, title, comment);
@@ -509,23 +574,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.publishComment = void 0;
+exports.getContext = exports.publishComment = void 0;
 const github_1 = __nccwpck_require__(5438);
 const markdown_1 = __nccwpck_require__(6162);
 const action_1 = __nccwpck_require__(194);
-const publishComment = (token, title, message) => __awaiter(void 0, void 0, void 0, function* () {
-    const context = getContext();
+const publishComment = (token, title, body) => __awaiter(void 0, void 0, void 0, function* () {
+    const context = (0, exports.getContext)();
     const { owner, repo, runId, issueNumber, commit } = context;
     if (!token || !owner || !repo || issueNumber === -1) {
         (0, action_1.log)('Failed to post a comment');
         return;
     }
-    const header = (0, markdown_1.formatHeaderMarkdown)(title);
+    const header = (0, markdown_1.formatHeaderMarkdown)(title); // I need a way to get around using this as it is created twice
     const octokit = (0, github_1.getOctokit)(token);
     const existingComment = yield getExistingComment(octokit, context, header);
-    const summaryLink = (0, markdown_1.formatSummaryLinkMarkdown)(owner, repo, runId, title);
-    const footer = commit ? (0, markdown_1.formatFooterMarkdown)(commit) : '';
-    const body = `${header}${message}${summaryLink}${footer}`;
     if (existingComment) {
         yield octokit.rest.issues.updateComment({ owner, repo, comment_id: existingComment.id, body });
     }
@@ -541,6 +603,7 @@ const getContext = () => {
     const [owner, repo] = ((_b = repository === null || repository === void 0 ? void 0 : repository.full_name) === null || _b === void 0 ? void 0 : _b.split('/')) || [];
     return { owner, repo, issueNumber, commit: after, runId };
 };
+exports.getContext = getContext;
 const getExistingComment = (octokit, context, header) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const { owner, repo, issueNumber } = context;
