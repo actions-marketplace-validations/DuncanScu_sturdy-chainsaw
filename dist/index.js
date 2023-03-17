@@ -8,6 +8,7 @@ require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CommentBuilder = void 0;
+const common_1 = __nccwpck_require__(2205);
 const markdown_1 = __nccwpck_require__(6162);
 const utils_1 = __nccwpck_require__(1606);
 class CommentBuilder {
@@ -15,26 +16,34 @@ class CommentBuilder {
         this._header = "";
         this._summaryLink = "";
         this._footer = "";
-        this._message = "";
         this._title = "";
-        this._message = (0, markdown_1.formatResultMarkdown)(testResult);
+        this.getStatusIcon = (success) => (success ? '🧪' : '❌');
+        this.getStatusText = (success) => (success ? '**passed**' : '**failed**');
+        this._testResult = testResult;
         this._context = (0, utils_1.getContext)();
     }
-    WithHeader(title = "Tests") {
+    withHeader(title = "Tests") {
         this._title = title;
         this._header = (0, markdown_1.formatHeaderMarkdown)(title);
         return this;
     }
-    WithSummaryLink() {
-        this._summaryLink = (0, markdown_1.formatSummaryLinkMarkdown)(this._context.owner, this._context.repo, this._context.runId, this._title);
+    withSummaryLink() {
+        const url = `https://github.com/${this._context.owner}/${this._context.repo}/actions/runs/${this._context.runId}#user-content-${(0, common_1.getSectionLink)(this._title)}`;
+        this._summaryLink = `🔍 click [here](${url}) for more details\n`;
         return this;
     }
-    WithFooter() {
-        this._footer = this._context.commit ? (0, markdown_1.formatFooterMarkdown)(this._context.commit) : '';
+    withFooter() {
+        this._footer = this._context.commit ? `<br/>_✏️ updated for commit ${this._context.commit.substring(0, 8)}_` : '';
         return this;
     }
-    Build() {
-        return `${this._header}${this._message}${this._summaryLink}${this._footer}`;
+    build() {
+        const { total, passed, failed, skipped, success } = this._testResult;
+        const title = `${this.getStatusIcon(success)}`;
+        const details = failed || skipped ? ` (${failed} failed, ${skipped} skipped)` : '';
+        const info = `**${passed} / ${total}**${details}`;
+        const status = `- Tests ${this.getStatusText(success)} in ${(0, common_1.formatElapsedTime)(this._testResult.elapsed)}`;
+        const message = `${title} ${info} ${status}\n`;
+        return `${this._header}${message}${this._summaryLink}${this._footer}`;
     }
 }
 exports.CommentBuilder = CommentBuilder;
@@ -158,11 +167,9 @@ exports.TestReportProcessor = TestReportProcessor;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.formatElapsedTime = exports.getStatusIcon = exports.getSectionLink = void 0;
+exports.formatElapsedTime = exports.getSectionLink = void 0;
 const getSectionLink = (section) => section.toLowerCase().replace(/ /g, '-');
 exports.getSectionLink = getSectionLink;
-const getStatusIcon = (success) => (success ? '✔️' : '❌');
-exports.getStatusIcon = getStatusIcon;
 const formatElapsedTime = (elapsed) => {
     const secondsDelimiter = 1000;
     const minutesDelimiter = 120000;
@@ -217,7 +224,7 @@ const formatLinesToCover = (linesToCover) => {
         .join(', ');
 };
 const formatTestSuit = (suit) => {
-    const icon = (0, common_1.getStatusIcon)(suit.success);
+    const icon = (suit.success ? '🧪' : '❌');
     const summary = `${icon} ${suit.name} - ${suit.passed}/${suit.tests.length}`;
     const hasOutput = suit.tests.some(test => test.output || test.error);
     const table = formatTable([{ name: 'Result', align: 'center' }, { name: 'Test' }, ...(hasOutput ? [{ name: 'Output' }] : [])], suit.tests.map(test => [outcomeIcons[test.outcome], test.name, ...(hasOutput ? [formatTestOutput(test)] : [])]));
@@ -266,32 +273,16 @@ const formatTable = (headers, rows) => {
 /***/ }),
 
 /***/ 6162:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+/***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.formatResultMarkdown = exports.formatSummaryLinkMarkdown = exports.formatFooterMarkdown = exports.formatHeaderMarkdown = void 0;
-const common_1 = __nccwpck_require__(2205);
+exports.formatFooterMarkdown = exports.formatHeaderMarkdown = void 0;
 const formatHeaderMarkdown = (header) => `## ${header}\n`;
 exports.formatHeaderMarkdown = formatHeaderMarkdown;
 const formatFooterMarkdown = (commit) => `<br/>_✏️ updated for commit ${commit.substring(0, 8)}_`;
 exports.formatFooterMarkdown = formatFooterMarkdown;
-const formatSummaryLinkMarkdown = (owner, repo, runId, title) => {
-    const url = `https://github.com/${owner}/${repo}/actions/runs/${runId}#user-content-${(0, common_1.getSectionLink)(title)}`;
-    return `🔍 click [here](${url}) for more details\n`;
-};
-exports.formatSummaryLinkMarkdown = formatSummaryLinkMarkdown;
-const formatResultMarkdown = (result) => {
-    const { total, passed, failed, skipped, success } = result;
-    const title = `${(0, common_1.getStatusIcon)(success)} Tests`;
-    const details = failed || skipped ? ` (${failed} failed, ${skipped} skipped)` : '';
-    const info = `**${passed} / ${total}**${details}`;
-    const status = `- ${getStatusText(success)} in ${(0, common_1.formatElapsedTime)(result.elapsed)}`;
-    return `${title} ${info} ${status}\n`;
-};
-exports.formatResultMarkdown = formatResultMarkdown;
-const getStatusText = (success) => (success ? '**passed**' : '**failed**');
 
 
 /***/ }),
@@ -324,10 +315,10 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
         // Build the comment
         const commentBuilder = new CommentBuilder_1.CommentBuilder(testResult);
         const comment = commentBuilder
-            .WithHeader()
-            .WithSummaryLink()
-            .WithFooter()
-            .Build();
+            .withHeader(title)
+            .withSummaryLink()
+            .withFooter()
+            .build();
         // Generate the summary
         const summaryGenerator = new SummaryGenerator_1.SummaryGenerator();
         const summary = summaryGenerator.generateSummary(title, testResult);
