@@ -16,7 +16,7 @@ export const readXmlFile = async (filePath: string): Promise<any> => {
   }
 };
 
-export const findFiles = (directoryPath: string, extension: string): string[] => {
+export const findFilesInDirectory = (directoryPath: string, extension: string): string[] => {
   try {
     if (!fs.existsSync(directoryPath)) {
       return [];

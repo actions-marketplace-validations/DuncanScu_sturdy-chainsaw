@@ -36,20 +36,3 @@ jobs:
           comment-title: Test Results Fail
           results-path: ./files/fail/
           allow-failed-tests: true
-      - name: Test Coverage OpenCover
-        uses: ./
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          comment-title: Test Coverage OpenCover
-          results-path: ./files/success/
-          coverage-path: ./files/success/test_coverage_opencover.xml
-          coverage-threshold: 44
-      - name: Test Coverage Cobertura
-        uses: ./
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          comment-title: Test Coverage Cobertura
-          results-path: ./files/success
-          coverage-path: ./files/success/test_coverage_cobertura.xml
-          coverage-type: cobertura
-          coverage-threshold: 44

@@ -1,26 +1,26 @@
 import { IResult } from './data';
-import { findFiles, log, setFailed, setResultOutputs } from './utils';
+import { findFilesInDirectory, log, setFailed, setResultOutputs } from './utils';
 import parseTrx from './parsers/trx';
 
 export const processTestResults = async (resultsPath: string): Promise<IResult> => {
-  const aggregatedResult = getDefaultTestResult();
-  const filePaths = findFiles(resultsPath, '.trx');
+  const result = DefaultTestResult;
+  const filePaths = findFilesInDirectory(resultsPath, '.trx');
 
   if (!filePaths.length) {
     throw Error(`No test results found in ${resultsPath}`);
   }
 
   for (const path of filePaths) {
-    await processResult(path, aggregatedResult);
+    await processResult(path, result);
   }
 
-  setResultOutputs(aggregatedResult);
+  setResultOutputs(result);
 
-  if (!aggregatedResult.success) {
+  if (!result.success) {
     setFailed('Tests Failed');
   }
 
-  return aggregatedResult;
+  return result;
 };
 
 const processResult = async (path: string, aggregatedResult: IResult): Promise<void> => {
@@ -44,7 +44,7 @@ const mergeTestResults = (result1: IResult, result2: IResult): void => {
   result1.suits.push(...result2.suits);
 };
 
-const getDefaultTestResult = (): IResult => ({
+const DefaultTestResult: IResult = {
   success: true,
   elapsed: 0,
   total: 0,
@@ -52,4 +52,4 @@ const getDefaultTestResult = (): IResult => ({
   failed: 0,
   skipped: 0,
   suits: []
-});
+};
