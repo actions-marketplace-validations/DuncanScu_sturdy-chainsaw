@@ -29,9 +29,9 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           comment-title: Test Results Success
           results-path: ./files/success/
-      # - name: Test Results Fail
-      #   uses: ./
-      #   with:
-      #     github-token: ${{ secrets.GITHUB_TOKEN }}
-      #     comment-title: Test Results Fail
-      #     results-path: ./files/fail/
+      - name: Test Results Fail
+        uses: ./
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          comment-title: Test Results Fail
+          results-path: ./files/fail/
