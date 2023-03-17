@@ -1,4 +1,4 @@
-import { ICoverage, ICoverageModule, IResult, ITest, ITestSuit, TestOutcome } from '../data';
+import { IResult, ITest, ITestSuit, TestOutcome } from '../data';
 import { formatElapsedTime, getSectionLink, getStatusIcon } from './common';
 
 interface Element {
@@ -31,41 +31,6 @@ export const formatResultHtml = (result: IResult): string => {
   html += result.suits.map(formatTestSuit).join('');
 
   return html;
-};
-
-export const formatCoverageHtml = (coverage: ICoverage): string => {
-  let html = wrap('Coverage', 'h3');
-  const lineInfo = `${coverage.linesCovered} / ${coverage.linesTotal} (${coverage.lineCoverage}%)`;
-  const branchInfo = `${coverage.branchesCovered} / ${coverage.branchesTotal} (${coverage.branchCoverage}%)`;
-
-  html += formatTable([{ name: '📏 Line' }, { name: '🌿 Branch' }], [[lineInfo, branchInfo]]);
-  html += coverage.modules.map(formatCoverageModule).join('');
-
-  return html;
-};
-
-const formatCoverageModule = (module: ICoverageModule): string => {
-  const icon = getStatusIcon(module.success);
-  const summary = `${icon} ${module.name} - ${module.coverage}%`;
-
-  const table = formatTable(
-    [
-      { name: 'File' },
-      { name: 'Total', align: 'center' },
-      { name: 'Line', align: 'center' },
-      { name: 'Branch', align: 'center' },
-      { name: 'Lines to Cover' }
-    ],
-    module.files.map(file => [
-      file.name,
-      `${file.linesCovered} / ${file.linesTotal}`,
-      `${file.lineCoverage}%`,
-      `${file.branchCoverage}%`,
-      formatLinesToCover(file.linesToCover)
-    ])
-  );
-
-  return formatDetails(summary, table);
 };
 
 const formatLinesToCover = (linesToCover: number[]): string => {

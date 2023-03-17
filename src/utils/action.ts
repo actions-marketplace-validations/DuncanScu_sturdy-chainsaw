@@ -1,5 +1,5 @@
 import * as core from '@actions/core';
-import { CoverageType, IActionInputs, ICoverage, IResult } from '../data';
+import { IActionInputs, IResult } from '../data';
 
 const inputs = {
   token: 'github-token',
@@ -31,12 +31,7 @@ export const getInputs = (): IActionInputs => {
   return {
     token,
     title: core.getInput(inputs.title),
-    postNewComment: core.getBooleanInput(inputs.postNewComment),
-    allowFailedTests: core.getBooleanInput(inputs.allowFailedTests),
-    resultsPath: core.getInput(inputs.resultsPath),
-    coveragePath: core.getInput(inputs.coveragePath),
-    coverageType: core.getInput(inputs.coverageType) as CoverageType,
-    coverageThreshold: Number(core.getInput(inputs.coverageThreshold))
+    resultsPath: core.getInput(inputs.resultsPath)
   };
 };
 
@@ -45,15 +40,6 @@ export const setResultOutputs = (result: IResult): void => {
   core.setOutput(outputs.passed, result.passed);
   core.setOutput(outputs.failed, result.failed);
   core.setOutput(outputs.skipped, result.skipped);
-};
-
-export const setCoverageOutputs = (coverage: ICoverage): void => {
-  core.setOutput(outputs.lineCoverage, coverage.lineCoverage);
-  core.setOutput(outputs.linesTotal, coverage.linesTotal);
-  core.setOutput(outputs.linesCovered, coverage.linesCovered);
-  core.setOutput(outputs.branchCoverage, coverage.branchCoverage);
-  core.setOutput(outputs.branchesTotal, coverage.branchesTotal);
-  core.setOutput(outputs.branchesCovered, coverage.branchesCovered);
 };
 
 export const setFailed = (message: string): void => {

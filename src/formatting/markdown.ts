@@ -1,4 +1,4 @@
-import { ICoverage, IResult } from '../data';
+import { IResult } from '../data';
 import { formatElapsedTime, getSectionLink, getStatusIcon } from './common';
 
 export const formatHeaderMarkdown = (header: string): string => `## ${header}\n`;
@@ -20,19 +20,6 @@ export const formatResultMarkdown = (result: IResult): string => {
   const status = `- ${getStatusText(success)} in ${formatElapsedTime(result.elapsed)}`;
 
   return `${title} ${info} ${status}\n`;
-};
-
-export const formatCoverageMarkdown = (coverage: ICoverage, min: number): string => {
-  const { totalCoverage, linesCovered, linesTotal, branchesTotal, branchesCovered, success } = coverage;
-
-  const title = `${min ? getStatusIcon(success) : '📝'} Coverage`;
-  const info = `**${totalCoverage}%**`;
-  const status = min ? `- ${getStatusText(success)} with ${min}% threshold` : '';
-
-  const lines = `📏 ${linesCovered} / ${linesTotal} lines covered`;
-  const branches = `🌿 ${branchesCovered} / ${branchesTotal} branches covered`;
-
-  return `${title} ${info} ${status}\n${lines} ${branches}\n`;
 };
 
 const getStatusText = (success: boolean) => (success ? '**passed**' : '**failed**');

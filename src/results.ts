@@ -2,7 +2,7 @@ import { IResult } from './data';
 import { findFiles, log, setFailed, setResultOutputs } from './utils';
 import parseTrx from './parsers/trx';
 
-export const processTestResults = async (resultsPath: string, allowFailedTests: boolean): Promise<IResult> => {
+export const processTestResults = async (resultsPath: string): Promise<IResult> => {
   const aggregatedResult = getDefaultTestResult();
   const filePaths = findFiles(resultsPath, '.trx');
 
@@ -17,7 +17,7 @@ export const processTestResults = async (resultsPath: string, allowFailedTests: 
   setResultOutputs(aggregatedResult);
 
   if (!aggregatedResult.success) {
-    allowFailedTests ? log('Tests Failed') : setFailed('Tests Failed');
+    setFailed('Tests Failed');
   }
 
   return aggregatedResult;

@@ -17,7 +17,6 @@ export const publishComment = async (
   token: string,
   title: string,
   message: string,
-  postNew: boolean
 ): Promise<void> => {
   const context = getContext();
   const { owner, repo, runId, issueNumber, commit } = context;
@@ -35,7 +34,7 @@ export const publishComment = async (
   const footer = commit ? formatFooterMarkdown(commit) : '';
   const body = `${header}${message}${summaryLink}${footer}`;
 
-  if (existingComment && !postNew) {
+  if (existingComment) {
     await octokit.rest.issues.updateComment({ owner, repo, comment_id: existingComment.id, body });
   } else {
     await octokit.rest.issues.createComment({ owner, repo, issue_number: issueNumber, body });

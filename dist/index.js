@@ -1,50 +1,6 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 5730:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.processTestCoverage = void 0;
-const utils_1 = __nccwpck_require__(1606);
-const opencover_1 = __importDefault(__nccwpck_require__(4949));
-const cobertura_1 = __importDefault(__nccwpck_require__(1890));
-const parsers = {
-    opencover: opencover_1.default,
-    cobertura: cobertura_1.default
-};
-const processTestCoverage = (coveragePath, coverageType, coverageThreshold) => __awaiter(void 0, void 0, void 0, function* () {
-    const coverage = yield parsers[coverageType](coveragePath, coverageThreshold);
-    if (!coverage) {
-        (0, utils_1.log)(`Failed parsing ${coveragePath}`);
-        return null;
-    }
-    (0, utils_1.log)(`Processed ${coveragePath}`);
-    (0, utils_1.setCoverageOutputs)(coverage);
-    if (!coverage.success) {
-        (0, utils_1.setFailed)('Coverage Failed');
-    }
-    return coverage;
-});
-exports.processTestCoverage = processTestCoverage;
-
-
-/***/ }),
-
 /***/ 2205:
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -80,7 +36,7 @@ exports.formatElapsedTime = formatElapsedTime;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.formatCoverageHtml = exports.formatResultHtml = exports.formatTitleHtml = void 0;
+exports.formatResultHtml = exports.formatTitleHtml = void 0;
 const common_1 = __nccwpck_require__(2205);
 const outcomeIcons = {
     Passed: '✔️',
@@ -96,33 +52,6 @@ const formatResultHtml = (result) => {
     return html;
 };
 exports.formatResultHtml = formatResultHtml;
-const formatCoverageHtml = (coverage) => {
-    let html = wrap('Coverage', 'h3');
-    const lineInfo = `${coverage.linesCovered} / ${coverage.linesTotal} (${coverage.lineCoverage}%)`;
-    const branchInfo = `${coverage.branchesCovered} / ${coverage.branchesTotal} (${coverage.branchCoverage}%)`;
-    html += formatTable([{ name: '📏 Line' }, { name: '🌿 Branch' }], [[lineInfo, branchInfo]]);
-    html += coverage.modules.map(formatCoverageModule).join('');
-    return html;
-};
-exports.formatCoverageHtml = formatCoverageHtml;
-const formatCoverageModule = (module) => {
-    const icon = (0, common_1.getStatusIcon)(module.success);
-    const summary = `${icon} ${module.name} - ${module.coverage}%`;
-    const table = formatTable([
-        { name: 'File' },
-        { name: 'Total', align: 'center' },
-        { name: 'Line', align: 'center' },
-        { name: 'Branch', align: 'center' },
-        { name: 'Lines to Cover' }
-    ], module.files.map(file => [
-        file.name,
-        `${file.linesCovered} / ${file.linesTotal}`,
-        `${file.lineCoverage}%`,
-        `${file.branchCoverage}%`,
-        formatLinesToCover(file.linesToCover)
-    ]));
-    return formatDetails(summary, table);
-};
 const formatLinesToCover = (linesToCover) => {
     const lineGroups = linesToCover
         .sort((a, b) => a - b)
@@ -191,7 +120,7 @@ const formatTable = (headers, rows) => {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.formatCoverageMarkdown = exports.formatResultMarkdown = exports.formatSummaryLinkMarkdown = exports.formatFooterMarkdown = exports.formatHeaderMarkdown = void 0;
+exports.formatResultMarkdown = exports.formatSummaryLinkMarkdown = exports.formatFooterMarkdown = exports.formatHeaderMarkdown = void 0;
 const common_1 = __nccwpck_require__(2205);
 const formatHeaderMarkdown = (header) => `## ${header}\n`;
 exports.formatHeaderMarkdown = formatHeaderMarkdown;
@@ -211,16 +140,6 @@ const formatResultMarkdown = (result) => {
     return `${title} ${info} ${status}\n`;
 };
 exports.formatResultMarkdown = formatResultMarkdown;
-const formatCoverageMarkdown = (coverage, min) => {
-    const { totalCoverage, linesCovered, linesTotal, branchesTotal, branchesCovered, success } = coverage;
-    const title = `${min ? (0, common_1.getStatusIcon)(success) : '📝'} Coverage`;
-    const info = `**${totalCoverage}%**`;
-    const status = min ? `- ${getStatusText(success)} with ${min}% threshold` : '';
-    const lines = `📏 ${linesCovered} / ${linesTotal} lines covered`;
-    const branches = `🌿 ${branchesCovered} / ${branchesTotal} branches covered`;
-    return `${title} ${info} ${status}\n${lines} ${branches}\n`;
-};
-exports.formatCoverageMarkdown = formatCoverageMarkdown;
 const getStatusText = (success) => (success ? '**passed**' : '**failed**');
 
 
@@ -242,260 +161,25 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const results_1 = __nccwpck_require__(8100);
-const coverage_1 = __nccwpck_require__(5730);
 const utils_1 = __nccwpck_require__(1606);
 const markdown_1 = __nccwpck_require__(6162);
 const html_1 = __nccwpck_require__(5957);
 const run = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { token, title, resultsPath, coveragePath, coverageType, coverageThreshold, postNewComment, allowFailedTests } = (0, utils_1.getInputs)();
+        const { token, title, resultsPath } = (0, utils_1.getInputs)();
         let comment = '';
         let summary = (0, html_1.formatTitleHtml)(title);
-        const testResult = yield (0, results_1.processTestResults)(resultsPath, allowFailedTests);
+        const testResult = yield (0, results_1.processTestResults)(resultsPath);
         comment += (0, markdown_1.formatResultMarkdown)(testResult);
         summary += (0, html_1.formatResultHtml)(testResult);
-        if (coveragePath) {
-            const testCoverage = yield (0, coverage_1.processTestCoverage)(coveragePath, coverageType, coverageThreshold);
-            comment += testCoverage ? (0, markdown_1.formatCoverageMarkdown)(testCoverage, coverageThreshold) : '';
-            summary += testCoverage ? (0, html_1.formatCoverageHtml)(testCoverage) : '';
-        }
         yield (0, utils_1.setSummary)(summary);
-        yield (0, utils_1.publishComment)(token, title, comment, postNewComment);
+        yield (0, utils_1.publishComment)(token, title, comment);
     }
     catch (error) {
         (0, utils_1.setFailed)(error.message);
     }
 });
 run();
-// public async publishResults(): Promise<void>{
-//   // this isnt the reponsability of this class
-//   const token = core.getInput('token');
-//   console.log(token)
-//   const octokit = github.getOctokit(token);
-//   await octokit.rest.issues.createComment({
-//       owner: "DuncanScu",
-//       repo: "sturdy-chainsaw",
-//       issue_number: 10,
-//       body: "Testing....please work"
-//     });
-// }
-/*
-Report:
-- Accepance Tests (The group)
-  Passed: 9
-  Failed: 1
-- Unit Tests
-  Passed: 10
-  Failed: 0
-- Integration Tests
-  Passed: 10
-  Failed: 0
-*/ 
-
-
-/***/ }),
-
-/***/ 1890:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const common_1 = __nccwpck_require__(5083);
-const parseCobertura = (filePath, threshold) => __awaiter(void 0, void 0, void 0, function* () { return (0, common_1.parseCoverage)(filePath, threshold, parseSummary, parseModules); });
-const parseSummary = (file) => {
-    const summary = file.coverage['$'];
-    const totalCoverage = (0, common_1.calculateCoverage)(Number(summary['lines-covered']) + Number(summary['branches-covered']), Number(summary['lines-valid']) + Number(summary['branches-valid']));
-    return {
-        totalCoverage,
-        linesTotal: Number(summary['lines-valid']),
-        linesCovered: Number(summary['lines-covered']),
-        lineCoverage: (0, common_1.calculateCoverage)(summary['lines-covered'], summary['lines-valid']),
-        branchesTotal: Number(summary['branches-valid']),
-        branchesCovered: Number(summary['branches-covered']),
-        branchCoverage: (0, common_1.calculateCoverage)(summary['branches-covered'], summary['branches-valid'])
-    };
-};
-const parseModules = (file, threshold) => {
-    var _a;
-    const modules = ((_a = file.coverage.packages[0].package) !== null && _a !== void 0 ? _a : []);
-    return modules.map(module => {
-        var _a;
-        const name = String(module['$'].name);
-        const classes = ((_a = module.classes[0].class) !== null && _a !== void 0 ? _a : []);
-        const files = parseFiles(classes);
-        classes.forEach(c => {
-            var _a;
-            const file = files.find(f => f.name === String(c['$'].filename));
-            const lines = ((_a = c.lines[0].line) !== null && _a !== void 0 ? _a : []);
-            const branchRegex = /\(([^)]+)\)/;
-            const branchData = lines
-                .filter(l => l['$']['condition-coverage'])
-                .map(l => { var _a, _b; return (_b = (_a = branchRegex.exec(String(l['$']['condition-coverage']))) === null || _a === void 0 ? void 0 : _a[1].split('/')) !== null && _b !== void 0 ? _b : []; });
-            if (file) {
-                file.linesTotal += Number(lines.length);
-                file.linesCovered += Number(lines.filter(l => Number(l['$'].hits) > 0).length);
-                file.branchesTotal += branchData.reduce((summ, branch) => summ + Number(branch[1]), 0);
-                file.branchesCovered += branchData.reduce((summ, branch) => summ + Number(branch[0]), 0);
-                file.linesToCover = file.linesToCover.concat(lines.filter(line => !Number(line['$'].hits)).map(line => Number(line['$'].number)));
-            }
-        });
-        return (0, common_1.createCoverageModule)(name, threshold, files);
-    });
-};
-const parseFiles = (classes) => {
-    const fileNames = [...new Set(classes.map(c => String(c['$'].filename)))];
-    return fileNames.map(file => ({
-        name: file,
-        totalCoverage: 0,
-        linesTotal: 0,
-        linesCovered: 0,
-        lineCoverage: 0,
-        branchesTotal: 0,
-        branchesCovered: 0,
-        branchCoverage: 0,
-        linesToCover: Array()
-    }));
-};
-exports.default = parseCobertura;
-
-
-/***/ }),
-
-/***/ 5083:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.parseCoverage = exports.createCoverageModule = exports.calculateCoverage = void 0;
-const utils_1 = __nccwpck_require__(1606);
-const calculateCoverage = (covered, total) => {
-    return total ? Math.round((covered / total) * 10000) / 100 : 100;
-};
-exports.calculateCoverage = calculateCoverage;
-const createCoverageModule = (name, threshold, files) => {
-    const total = files.reduce((summ, file) => summ + file.linesTotal + file.branchesTotal, 0);
-    const covered = files.reduce((summ, file) => summ + file.linesCovered + file.branchesCovered, 0);
-    const coverage = (0, exports.calculateCoverage)(covered, total);
-    const success = !threshold || coverage >= threshold;
-    const updatedFiles = files
-        .map(file => (Object.assign(Object.assign({}, file), { totalCoverage: (0, exports.calculateCoverage)(file.linesCovered + file.branchesCovered, file.linesTotal + file.branchesTotal), lineCoverage: (0, exports.calculateCoverage)(file.linesCovered, file.linesTotal), branchCoverage: (0, exports.calculateCoverage)(file.branchesCovered, file.branchesTotal) })))
-        .sort((a, b) => a.name.localeCompare(b.name));
-    return { name, coverage, success, files: updatedFiles };
-};
-exports.createCoverageModule = createCoverageModule;
-const parseCoverage = (filePath, threshold, parseSummary, parseModules) => __awaiter(void 0, void 0, void 0, function* () {
-    const file = yield (0, utils_1.readXmlFile)(filePath);
-    if (!file) {
-        return null;
-    }
-    const summary = parseSummary(file);
-    const modules = parseModules(file, threshold);
-    const success = !threshold || summary.totalCoverage >= threshold;
-    return Object.assign(Object.assign({ success }, summary), { modules });
-});
-exports.parseCoverage = parseCoverage;
-
-
-/***/ }),
-
-/***/ 4949:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const common_1 = __nccwpck_require__(5083);
-const parseOpencover = (filePath, threshold) => __awaiter(void 0, void 0, void 0, function* () { return (0, common_1.parseCoverage)(filePath, threshold, parseSummary, parseModules); });
-const parseSummary = (file) => {
-    const summary = file.CoverageSession.Summary[0]['$'];
-    const totalCoverage = (0, common_1.calculateCoverage)(Number(summary.visitedSequencePoints) + Number(summary.visitedBranchPoints), Number(summary.numSequencePoints) + Number(summary.numBranchPoints));
-    return {
-        totalCoverage,
-        linesTotal: Number(summary.numSequencePoints),
-        linesCovered: Number(summary.visitedSequencePoints),
-        lineCoverage: (0, common_1.calculateCoverage)(summary.visitedSequencePoints, summary.numSequencePoints),
-        branchesTotal: Number(summary.numBranchPoints),
-        branchesCovered: Number(summary.visitedBranchPoints),
-        branchCoverage: (0, common_1.calculateCoverage)(summary.visitedBranchPoints, summary.numBranchPoints)
-    };
-};
-const parseModules = (file, threshold) => {
-    var _a;
-    const modules = ((_a = file.CoverageSession.Modules[0].Module) !== null && _a !== void 0 ? _a : []);
-    return modules.map(module => {
-        var _a;
-        const name = String(module.ModuleName[0]);
-        const files = parseFiles(name, module);
-        const classes = ((_a = module.Classes[0].Class) !== null && _a !== void 0 ? _a : []);
-        classes.forEach(c => {
-            var _a;
-            const methods = ((_a = c.Methods[0].Method) !== null && _a !== void 0 ? _a : []);
-            methods.forEach(m => {
-                var _a;
-                const file = files.find(f => f.id === m.FileRef[0]['$'].uid);
-                const summary = m.Summary[0]['$'];
-                const lines = ((_a = m.SequencePoints[0].SequencePoint) !== null && _a !== void 0 ? _a : []);
-                if (file) {
-                    file.linesTotal += Number(summary.numSequencePoints);
-                    file.linesCovered += Number(summary.visitedSequencePoints);
-                    file.branchesTotal += Number(summary.numBranchPoints);
-                    file.branchesCovered += Number(summary.visitedBranchPoints);
-                    file.linesToCover = file.linesToCover.concat(lines.filter(line => !Number(line['$'].vc)).map(line => Number(line['$'].sl)));
-                }
-            });
-        });
-        return (0, common_1.createCoverageModule)(name, threshold, files);
-    });
-};
-const parseFiles = (moduleName, module) => {
-    var _a;
-    const fileData = ((_a = module.Files[0].File) !== null && _a !== void 0 ? _a : []);
-    return fileData.map(file => {
-        var _a;
-        return ({
-            id: String(file['$'].uid),
-            name: (_a = String(file['$'].fullPath).split(`${moduleName}\\`).slice(-1).pop()) !== null && _a !== void 0 ? _a : '',
-            totalCoverage: 0,
-            linesTotal: 0,
-            linesCovered: 0,
-            lineCoverage: 0,
-            branchesTotal: 0,
-            branchesCovered: 0,
-            branchCoverage: 0,
-            linesToCover: Array()
-        });
-    });
-};
-exports.default = parseOpencover;
 
 
 /***/ }),
@@ -645,7 +329,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.processTestResults = void 0;
 const utils_1 = __nccwpck_require__(1606);
 const trx_1 = __importDefault(__nccwpck_require__(7421));
-const processTestResults = (resultsPath, allowFailedTests) => __awaiter(void 0, void 0, void 0, function* () {
+const processTestResults = (resultsPath) => __awaiter(void 0, void 0, void 0, function* () {
     const aggregatedResult = getDefaultTestResult();
     const filePaths = (0, utils_1.findFiles)(resultsPath, '.trx');
     if (!filePaths.length) {
@@ -656,7 +340,7 @@ const processTestResults = (resultsPath, allowFailedTests) => __awaiter(void 0, 
     }
     (0, utils_1.setResultOutputs)(aggregatedResult);
     if (!aggregatedResult.success) {
-        allowFailedTests ? (0, utils_1.log)('Tests Failed') : (0, utils_1.setFailed)('Tests Failed');
+        (0, utils_1.setFailed)('Tests Failed');
     }
     return aggregatedResult;
 });
@@ -725,7 +409,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.log = exports.setSummary = exports.setFailed = exports.setCoverageOutputs = exports.setResultOutputs = exports.getInputs = void 0;
+exports.log = exports.setSummary = exports.setFailed = exports.setResultOutputs = exports.getInputs = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const inputs = {
     token: 'github-token',
@@ -754,12 +438,7 @@ const getInputs = () => {
     return {
         token,
         title: core.getInput(inputs.title),
-        postNewComment: core.getBooleanInput(inputs.postNewComment),
-        allowFailedTests: core.getBooleanInput(inputs.allowFailedTests),
-        resultsPath: core.getInput(inputs.resultsPath),
-        coveragePath: core.getInput(inputs.coveragePath),
-        coverageType: core.getInput(inputs.coverageType),
-        coverageThreshold: Number(core.getInput(inputs.coverageThreshold))
+        resultsPath: core.getInput(inputs.resultsPath)
     };
 };
 exports.getInputs = getInputs;
@@ -770,15 +449,6 @@ const setResultOutputs = (result) => {
     core.setOutput(outputs.skipped, result.skipped);
 };
 exports.setResultOutputs = setResultOutputs;
-const setCoverageOutputs = (coverage) => {
-    core.setOutput(outputs.lineCoverage, coverage.lineCoverage);
-    core.setOutput(outputs.linesTotal, coverage.linesTotal);
-    core.setOutput(outputs.linesCovered, coverage.linesCovered);
-    core.setOutput(outputs.branchCoverage, coverage.branchCoverage);
-    core.setOutput(outputs.branchesTotal, coverage.branchesTotal);
-    core.setOutput(outputs.branchesCovered, coverage.branchesCovered);
-};
-exports.setCoverageOutputs = setCoverageOutputs;
 const setFailed = (message) => {
     core.setFailed(message);
 };
@@ -814,7 +484,7 @@ exports.publishComment = void 0;
 const github_1 = __nccwpck_require__(5438);
 const markdown_1 = __nccwpck_require__(6162);
 const action_1 = __nccwpck_require__(194);
-const publishComment = (token, title, message, postNew) => __awaiter(void 0, void 0, void 0, function* () {
+const publishComment = (token, title, message) => __awaiter(void 0, void 0, void 0, function* () {
     const context = getContext();
     const { owner, repo, runId, issueNumber, commit } = context;
     if (!token || !owner || !repo || issueNumber === -1) {
@@ -827,7 +497,7 @@ const publishComment = (token, title, message, postNew) => __awaiter(void 0, voi
     const summaryLink = (0, markdown_1.formatSummaryLinkMarkdown)(owner, repo, runId, title);
     const footer = commit ? (0, markdown_1.formatFooterMarkdown)(commit) : '';
     const body = `${header}${message}${summaryLink}${footer}`;
-    if (existingComment && !postNew) {
+    if (existingComment) {
         yield octokit.rest.issues.updateComment({ owner, repo, comment_id: existingComment.id, body });
     }
     else {
