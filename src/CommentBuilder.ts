@@ -1,6 +1,5 @@
 import { IResult } from "./data";
 import { formatElapsedTime, getSectionLink } from "./formatting/common";
-import { formatHeaderMarkdown } from "./formatting/markdown";
 import { getContext, IContext } from "./utils";
 
 export class CommentBuilder {
@@ -18,7 +17,7 @@ export class CommentBuilder {
   
     public withHeader(title:string = "Tests") : CommentBuilder {
       this._title = title;
-      this._header = formatHeaderMarkdown(title);
+      this._header = `## ${title}\n`;;
       return this;
     }
   

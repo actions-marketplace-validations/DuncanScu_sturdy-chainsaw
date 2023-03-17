@@ -1,6 +1,5 @@
 import { GitHub } from '@actions/github/lib/utils';
 import { getOctokit, context } from '@actions/github/lib/github';
-import { formatHeaderMarkdown } from '../formatting/markdown';
 import { log } from './action';
 
 type Octokit = InstanceType<typeof GitHub>;
@@ -26,7 +25,7 @@ export const publishComment = async (
     return;
   }
 
-  const header = formatHeaderMarkdown(title); // I need a way to get around using this as it is created twice
+  const header = `## ${title}\n`; // I need a way to get around using this as it is created twice
 
   const octokit = getOctokit(token);
   const existingComment = await getExistingComment(octokit, context, header);

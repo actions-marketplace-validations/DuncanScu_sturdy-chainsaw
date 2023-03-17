@@ -9,7 +9,6 @@ require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CommentBuilder = void 0;
 const common_1 = __nccwpck_require__(2205);
-const markdown_1 = __nccwpck_require__(6162);
 const utils_1 = __nccwpck_require__(1606);
 class CommentBuilder {
     constructor(testResult) {
@@ -24,7 +23,8 @@ class CommentBuilder {
     }
     withHeader(title = "Tests") {
         this._title = title;
-        this._header = (0, markdown_1.formatHeaderMarkdown)(title);
+        this._header = `## ${title}\n`;
+        ;
         return this;
     }
     withSummaryLink() {
@@ -204,29 +204,16 @@ const outcomeIcons = {
 const formatTitleHtml = (title) => wrap(title, { tag: 'h1', attributes: { id: (0, common_1.getSectionLink)(title) } });
 exports.formatTitleHtml = formatTitleHtml;
 const formatResultHtml = (result) => {
-    let html = wrap('Tests', 'h3');
-    html += formatTable([{ name: '✔️ Passed' }, { name: '❌ Failed' }, { name: '⚠️ Skipped' }, { name: '⏱️ Time' }], [[`${result.passed}`, `${result.failed}`, `${result.skipped}`, (0, common_1.formatElapsedTime)(result.elapsed)]]);
+    let html = wrap('Test Results', 'h3');
+    html += formatTable([{ name: '🧪 Passed' }, { name: '❌ Failed' }, { name: '⚠️ Skipped' }, { name: '⏱️ Time' }], [[`${result.passed}`, `${result.failed}`, `${result.skipped}`, (0, common_1.formatElapsedTime)(result.elapsed)]]);
     html += result.suits.map(formatTestSuit).join('');
     return html;
 };
 exports.formatResultHtml = formatResultHtml;
-const formatLinesToCover = (linesToCover) => {
-    const lineGroups = linesToCover
-        .sort((a, b) => a - b)
-        .reduce((groups, line, i, a) => {
-        if (!i || line !== a[i - 1] + 1)
-            groups.push([]);
-        groups[groups.length - 1].push(line);
-        return groups;
-    }, []);
-    return lineGroups
-        .map(group => (group.length < 3 ? group.join(', ') : `${group[0]}-${group[group.length - 1]}`))
-        .join(', ');
-};
 const formatTestSuit = (suit) => {
     const icon = (suit.success ? '🧪' : '❌');
     const summary = `${icon} ${suit.name} - ${suit.passed}/${suit.tests.length}`;
-    const hasOutput = suit.tests.some(test => test.output || test.error);
+    const hasOutput = suit.tests.some(test => test.error);
     const table = formatTable([{ name: 'Result', align: 'center' }, { name: 'Test' }, ...(hasOutput ? [{ name: 'Output' }] : [])], suit.tests.map(test => [outcomeIcons[test.outcome], test.name, ...(hasOutput ? [formatTestOutput(test)] : [])]));
     return formatDetails(summary, table);
 };
@@ -268,21 +255,6 @@ const formatTable = (headers, rows) => {
     const bodyHtml = wrap(`${headersHtml}${rowsHtml}`, 'tbody');
     return wrap(bodyHtml, { tag: 'table', attributes: { role: 'table' } });
 };
-
-
-/***/ }),
-
-/***/ 6162:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.formatFooterMarkdown = exports.formatHeaderMarkdown = void 0;
-const formatHeaderMarkdown = (header) => `## ${header}\n`;
-exports.formatHeaderMarkdown = formatHeaderMarkdown;
-const formatFooterMarkdown = (commit) => `<br/>_✏️ updated for commit ${commit.substring(0, 8)}_`;
-exports.formatFooterMarkdown = formatFooterMarkdown;
 
 
 /***/ }),
@@ -567,7 +539,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getContext = exports.publishComment = void 0;
 const github_1 = __nccwpck_require__(5438);
-const markdown_1 = __nccwpck_require__(6162);
 const action_1 = __nccwpck_require__(194);
 const publishComment = (token, title, body) => __awaiter(void 0, void 0, void 0, function* () {
     const context = (0, exports.getContext)();
@@ -576,7 +547,7 @@ const publishComment = (token, title, body) => __awaiter(void 0, void 0, void 0,
         (0, action_1.log)('Failed to post a comment');
         return;
     }
-    const header = (0, markdown_1.formatHeaderMarkdown)(title); // I need a way to get around using this as it is created twice
+    const header = `## ${title}\n`; // I need a way to get around using this as it is created twice
     const octokit = (0, github_1.getOctokit)(token);
     const existingComment = yield getExistingComment(octokit, context, header);
     if (existingComment) {

@@ -21,10 +21,10 @@ export const formatTitleHtml = (title: string): string =>
   wrap(title, { tag: 'h1', attributes: { id: getSectionLink(title) } });
 
 export const formatResultHtml = (result: IResult): string => {
-  let html = wrap('Tests', 'h3');
+  let html = wrap('Test Results', 'h3');
 
   html += formatTable(
-    [{ name: '✔️ Passed' }, { name: '❌ Failed' }, { name: '⚠️ Skipped' }, { name: '⏱️ Time' }],
+    [{ name: '🧪 Passed' }, { name: '❌ Failed' }, { name: '⚠️ Skipped' }, { name: '⏱️ Time' }],
     [[`${result.passed}`, `${result.failed}`, `${result.skipped}`, formatElapsedTime(result.elapsed)]]
   );
 
@@ -33,24 +33,10 @@ export const formatResultHtml = (result: IResult): string => {
   return html;
 };
 
-const formatLinesToCover = (linesToCover: number[]): string => {
-  const lineGroups = linesToCover
-    .sort((a, b) => a - b)
-    .reduce((groups: number[][], line, i, a) => {
-      if (!i || line !== a[i - 1] + 1) groups.push([]);
-      groups[groups.length - 1].push(line);
-      return groups;
-    }, []);
-
-  return lineGroups
-    .map(group => (group.length < 3 ? group.join(', ') : `${group[0]}-${group[group.length - 1]}`))
-    .join(', ');
-};
-
 const formatTestSuit = (suit: ITestSuit): string => {
   const icon = (suit.success ? '🧪' : '❌');
   const summary = `${icon} ${suit.name} - ${suit.passed}/${suit.tests.length}`;
-  const hasOutput = suit.tests.some(test => test.output || test.error);
+  const hasOutput = suit.tests.some(test => test.error);
 
   const table = formatTable(
     [{ name: 'Result', align: 'center' }, { name: 'Test' }, ...(hasOutput ? [{ name: 'Output' }] : [])],
